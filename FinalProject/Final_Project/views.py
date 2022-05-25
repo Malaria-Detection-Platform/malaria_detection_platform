@@ -1,12 +1,14 @@
 from django.http import JsonResponse
 from Final_Project import models
 from Final_Project import serializers
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework_swagger import renderers
 from rest_framework.response import Response
 from rest_framework import status
 
 
 @api_view(['GET', 'POST'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def hospital_list(request):
     if request.method == 'GET':
         hospitals = models.Hospital.objects.all()
@@ -21,6 +23,7 @@ def hospital_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def hospital_detail(request, id):
     try:
         hospital = models.Hospital.objects.get(pk=id)
@@ -43,6 +46,7 @@ def hospital_detail(request, id):
 
 
 @api_view(['GET', 'POST'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def person_list(request):
     if request.method == 'GET':
         people = models.Person.objects.all()
@@ -57,6 +61,7 @@ def person_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def person_detail(request, id):
     try:
         person = models.Person.objects.get(pk=id)
@@ -78,6 +83,7 @@ def person_detail(request, id):
 
 
 @api_view(['GET', 'POST'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def credential_list(request):
     if request.method == 'GET':
         credentials = models.Credential.objects.all()
@@ -92,6 +98,7 @@ def credential_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def credential_detail(request, id):
     try:
         credential = models.Credential.objects.get(pk=id)
@@ -114,6 +121,7 @@ def credential_detail(request, id):
 
 
 @api_view(['GET', 'POST'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def request_diagnostic_list(request):
     if request.method == 'GET':
         request_diagnostics = models.RequestDiagnostic.objects.all()
@@ -129,6 +137,7 @@ def request_diagnostic_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def request_diagnostic_detail(request, id):
     try:
         request_diagnostic = models.RequestDiagnostic.objects.get(pk=id)
@@ -152,6 +161,7 @@ def request_diagnostic_detail(request, id):
 
 
 @api_view(['GET', 'POST'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def patient_list(request):
     if request.method == 'GET':
         patients = models.Patient.objects.all()
@@ -166,6 +176,7 @@ def patient_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def patient_detail(request, id):
     try:
         patient = models.Patient.objects.get(pk=id)
@@ -189,6 +200,7 @@ def patient_detail(request, id):
 
 
 @api_view(['GET', 'POST'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def prescription_list(request):
     if request.method == 'GET':
         prescriptions = models.Prescriptions.objects.all()
@@ -203,6 +215,7 @@ def prescription_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def prescription_detail(request, id):
     try:
         prescription = models.Prescription.objects.get(pk=id)
