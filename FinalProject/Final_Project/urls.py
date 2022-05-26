@@ -1,9 +1,12 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from Final_Project import views
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from django.conf.urls.static import static
+from django.conf import settings
+# from django.views.generic import RedirectView
 schema_view = get_schema_view(
    openapi.Info(
       title="Snippets API",
@@ -20,6 +23,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('' , RedirectView.as_view(url ="/hospital/")),
     path('hospital/', views.hospital_list),
     path('person/', views.person_list),
     path('credential/', views.credential_list),
@@ -32,7 +36,8 @@ urlpatterns = [
     path('request_diagnostic/<int:id>', views.request_diagnostic_detail),
     path('patient/<int:id>', views.patient_detail),
     path('prescription/<int:id>', views.prescription_detail),
-
+    path('predict/', include('mlApi.api.urls')),
+    
 
     path('swagger.json', schema_view.without_ui(
         cache_timeout=0), name='schema-json'),
@@ -41,3 +46,5 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', 
         cache_timeout=0), name='schema-redoc'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
