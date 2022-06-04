@@ -1,7 +1,7 @@
 #Load classifier and assign to each crop the predicted species
 import tensorflow as tf
 from django.conf import settings
-from tensorflow.keras.models import Model, load_model
+from tensorflow.python.keras.models import Model, load_model
 import matplotlib.pyplot as plt
 import os
 import cv2
