@@ -1,4 +1,5 @@
 #crop the largest parasite from each image and save it. requires orginal image and associated binary mask
+from fnmatch import fnmatch
 from django.conf import settings
 import cv2 
 import os
@@ -176,6 +177,7 @@ def crop():
     extension = ".png"
     #gt_file_list = os.listdir(gt_directory)
     original_file_list = os.listdir(original_directory)
+    global fn
     fn=[]
     for original_file_name in tqdm(original_file_list):
     
