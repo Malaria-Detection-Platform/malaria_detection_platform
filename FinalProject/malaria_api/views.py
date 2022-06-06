@@ -1,8 +1,9 @@
 from malaria import models
 from malaria_api import serializers
-from rest_framework import generics
+from rest_framework import generics, permissions
 import coreapi
 from rest_framework.schemas import AutoSchema
+from authentication import custom_permissions
 
 
 class MalariaViewSchema(AutoSchema):
@@ -17,85 +18,168 @@ class MalariaViewSchema(AutoSchema):
         return manual_fields + extra_fields
 
 
-class HospitalList(generics.ListCreateAPIView):
+class HospitalList(generics.ListAPIView):
     schema = MalariaViewSchema()
+    permission_classes = [
+        permissions.IsAuthenticated & custom_permissions.isAdmin]
     queryset = models.Hospital.objects.all()
     serializer_class = serializers.HospitalSerializer
 
 
-class HospitalDetail(generics.RetrieveDestroyAPIView):
+class HospitalDetail(generics.RetrieveUpdateDestroyAPIView):
     schema = MalariaViewSchema()
+    permission_classes = [
+        permissions.IsAuthenticated & custom_permissions.isAdmin]
     queryset = models.Hospital.objects.all()
     serializer_class = serializers.HospitalSerializer
 
 
-class RegisteredPersonnelList(generics.ListCreateAPIView):
+class RegisteredPersonnelList(generics.ListAPIView):
+    schema = MalariaViewSchema()
+    serializer_class = serializers.RegisteredPersonnelSerializer
+
+    def get_queryset(self):
+        queryset = models.RegisteredPersonnel.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(hospital__user_id=user_id)
+        return queryset
+
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isEmployee]
+
+
+class RegisteredPersonnelDetail(generics.RetrieveUpdateAPIView):
     schema = MalariaViewSchema()
     queryset = models.RegisteredPersonnel.objects.all()
     serializer_class = serializers.RegisteredPersonnelSerializer
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isEmployee & custom_permissions.hasWritePermission]
 
 
-class RegisteredPersonnelDetail(generics.RetrieveDestroyAPIView):
+class ReceptionistPatientList(generics.ListCreateAPIView):
     schema = MalariaViewSchema()
-    queryset = models.RegisteredPersonnel.objects.all()
-    serializer_class = serializers.RegisteredPersonnelSerializer
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isReceptionist & custom_permissions.isOwnerPersonnel]
 
-
-class CredentialList(generics.ListCreateAPIView):
-    schema = MalariaViewSchema()
-    queryset = models.Credential.objects.all()
-    serializer_class = serializers.CredentialSerializer
-
-
-class CredentialDetail(generics.RetrieveDestroyAPIView):
-    schema = MalariaViewSchema()
-    queryset = models.Credential.objects.all()
-    serializer_class = serializers.CredentialSerializer
-
-
-class PatientList(generics.ListCreateAPIView):
-    schema = MalariaViewSchema()
-    queryset = models.Patient.objects.all()
+    def get_queryset(self):
+        queryset = models.Patient.objects.all()
+        hospital = self.request.query_params.get('hospital')
+        queryset = queryset.filter(hospital=hospital)
+        return queryset
     serializer_class = serializers.PatientSerializer
 
 
-class PatientDetail(generics.RetrieveDestroyAPIView):
+class ReceptionistPatientDetail(generics.RetrieveUpdateDestroyAPIView):
     schema = MalariaViewSchema()
-    queryset = models.Patient.objects.all()
+
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isReceptionist & custom_permissions.isOwnerPersonnel]
+
+    def get_queryset(self):
+        queryset = models.Patient.objects.all()
+        hospital = self.request.query_params.get('hospital')
+        queryset = queryset.filter(hospital=hospital)
+        return queryset
+
     serializer_class = serializers.PatientSerializer
 
 
-class PatientCheckupList(generics.ListCreateAPIView):
+class DoctorPatientList(generics.ListAPIView):
     schema = MalariaViewSchema()
-    queryset = models.PatientCheckup.objects.all()
-    serializer_class = serializers.PatientCheckupSerializer
+
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isDoctor & custom_permissions.isDoctorOfPatient & custom_permissions.isOwnerPersonnel]
+
+    def get_queryset(self):
+        queryset = models.Patient.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(doctor__user_id=user_id)
+        return queryset
+    serializer_class = serializers.PatientSerializer
 
 
-class PatientCheckupDetail(generics.RetrieveDestroyAPIView):
+class DoctorPatientDetail(generics.RetrieveUpdateAPIView):
     schema = MalariaViewSchema()
+
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isDoctor & custom_permissions.isDoctorOfPatient & custom_permissions.isOwnerPersonnel]
+
+    def get_queryset(self):
+        queryset = models.Patient.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(doctor__user_id=user_id)
+        return queryset
+    serializer_class = serializers.PatientSerializer
+
+
+class PatientCheckupList(generics.RetrieveUpdateAPIView):
+    schema = MalariaViewSchema()
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isDoctor & custom_permissions.hasChecupListAccess]
     queryset = models.PatientCheckup.objects.all()
     serializer_class = serializers.PatientCheckupSerializer
 
 
 class RequestDiagnosticList(generics.ListCreateAPIView):
     schema = MalariaViewSchema()
-    queryset = models.RequestDiagnostic.objects.all()
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isDoctor]
+
+    def get_queryset(self):
+        queryset = models.RequestDiagnostic.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(doctor__user_id=user_id)
+        return queryset
     serializer_class = serializers.RequestDiagnosticSerializer
 
 
-class RequestDiagnosticDetail(generics.RetrieveDestroyAPIView):
+class RequestDiagnosticDetail(generics.RetrieveUpdateDestroyAPIView):
     schema = MalariaViewSchema()
-    queryset = models.RequestDiagnostic.objects.all()
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isDoctor]
+
+    def get_queryset(self):
+        queryset = models.RequestDiagnostic.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(doctor__user_id=user_id)
+        return queryset
     serializer_class = serializers.RequestDiagnosticSerializer
 
 
-class PrescriptionList(generics.ListCreateAPIView):
+class DiagnosticResult(generics.RetrieveUpdateAPIView):
     schema = MalariaViewSchema()
-    queryset = models.Prescription.objects.all()
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isLabTech]
+
+    def get_queryset(self):
+        queryset = models.RequestDiagnostic.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(lab_technician__user_id=user_id)
+        return queryset
+    serializer_class = serializers.RequestDiagnosticSerializer
+
+
+class PrescriptionList(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isDoctor]
+    schema = MalariaViewSchema()
+
+    def get_queryset(self):
+        queryset = models.RequestDiagnostic.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(doctor__user_id=user_id)
+        return queryset
     serializer_class = serializers.PrescriptionSerializer
 
 
 class PrescriptionDetail(generics.RetrieveDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated &
+                          custom_permissions.isDoctor & custom_permissions.isPrescriptionOfDoctor]
     schema = MalariaViewSchema()
-    queryset = models.Patient.objects.all()
+
+    def get_queryset(self):
+        queryset = models.RequestDiagnostic.objects.all()
+        user_id = self.request.query_params.get('id')
+        queryset = queryset.filter(doctor__user_id=user_id)
+        return queryset
     serializer_class = serializers.PrescriptionSerializer

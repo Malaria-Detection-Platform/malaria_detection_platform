@@ -16,12 +16,6 @@ class RegisteredPersonnelSerializer(serializers.ModelSerializer):
                   'profile_picture', 'description', 'hospital_id', 'isActive']
 
 
-class CredentialSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Credential
-        fields = ['id', 'role', 'email', 'password', ]
-
-
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Patient

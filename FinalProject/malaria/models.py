@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
+from authentication.models import User
 
 
 # Create your models here.
@@ -8,7 +7,7 @@ from django.utils import timezone
 
 class Hospital(models.Model):
     user = models.OneToOneField(
-        User, related_name="hosptal", on_delete=models.CASCADE)
+        User, related_name="hosptals", on_delete=models.CASCADE, default=None, null=True)
     name = models.CharField(max_length=200, default=" ")
     email = models.EmailField(max_length=100, default=" ")
     city = models.CharField(max_length=100, default=" ")
@@ -20,14 +19,14 @@ class Hospital(models.Model):
 
 class RegisteredPersonnel(models.Model):
     user = models.OneToOneField(
-        User, related_name="personnel", on_delete=models.CASCADE)
+        User, related_name="personnel", on_delete=models.CASCADE, default=None)
     name = models.CharField(max_length=200, default=" ")
     email = models.EmailField(max_length=200, default=" ")
     phone = models.CharField(max_length=20, default=" ")
     city = models.CharField(max_length=100, default=" ")
     sub_city = models.CharField(max_length=100, default=" ")
     woreda = models.CharField(max_length=10, default=" ")
-    profile_picture = models.CharField(max_length=300, default=" ")
+    profile_picture = models.ImageField(max_length=300, default=" ")
     description = models.TextField(max_length=500, default=" ")
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
     isActive = models.BooleanField(default=True)
@@ -43,7 +42,8 @@ class Patient(models.Model):
 
 
 class PatientCheckup(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient = models.OneToOneField(
+        Patient, related_name="patient", on_delete=models.CASCADE, default=None)
     bmi = models.FloatField(max_length=5)
     temperature = models.FloatField(max_length=5)
     blood_pressure = models.FloatField(max_length=5)
@@ -64,18 +64,18 @@ class PatientCheckup(models.Model):
 
 
 class RequestDiagnostic(models.Model):
+
     patient_name = models.ForeignKey(Patient, on_delete=models.CASCADE)
     result = models.CharField(max_length=100, default="Pending")
-    doctor_name = models.ForeignKey(
+    doctor = models.ForeignKey(
         RegisteredPersonnel, on_delete=models.CASCADE, related_name="Doctor")
-    lab_technician_name = models.ForeignKey(
+    lab_technician = models.ForeignKey(
         RegisteredPersonnel, on_delete=models.CASCADE, related_name="Lab_Technician")
-    cell_image = models.CharField(max_length=300)
 
 
 class Prescription(models.Model):
-    patient_name = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     medicine_name = models.CharField(max_length=200)
-    doctor_name = models.ForeignKey(
+    doctor = models.ForeignKey(
         RegisteredPersonnel, on_delete=models.CASCADE)
     instruction = models.CharField(max_length=200)
