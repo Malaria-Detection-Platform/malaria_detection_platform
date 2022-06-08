@@ -1,7 +1,10 @@
 [[source]]
+name = "pypi"
 url = "https://pypi.python.org/simple"
 verify_ssl = true
-name = "pypi"
+
+
+[dev-packages]
 
 [packages]
 absl-py = "==1.1.0"
@@ -165,7 +168,7 @@ xkit = "==0.0.0"
 yarg = "==0.1.9"
 zipp = "==1.0.0"
 
-[dev-packages]
+
 
 [requires]
 python_version = "3.9"
